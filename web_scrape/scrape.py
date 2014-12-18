@@ -40,7 +40,7 @@ def scrape_subject_rating(url, subId):
     tree = html.fromstring(page.text)
     s = tree.xpath("//ul[@id='navMenuNeue']/li/a/@class")
     if not any(['focus' in e for e in s]):
-        return False
+        return []
     s = tree.xpath("//ul[@id='navMenuNeue']/li[1]/a/@class")[0]
     result = []
     if 'focus' in s and 'anime' in s:
@@ -50,11 +50,11 @@ def scrape_subject_rating(url, subId):
     return result
 
 
-def scrape_ratings():
+def scrape_ratings(frm, to):
     url = 'http://bgm.tv/subject/'
-    n = 1
+    n = frm
     result = []
-    while (True):
+    while (n <= to):
         print "starting subject " + str(n)
         temp = scrape_subject_rating(url + str(n), n)
         if temp is False:
@@ -63,9 +63,15 @@ def scrape_ratings():
             result = result + temp
         print "finished subject " + str(n)
         n += 1
-    path = os.path.join(os.pardir, os.pardir, 'data', 'ratings.csv')
+    path = os.path.join(os.pardir, os.pardir,
+                        'data', 'ratings_{}_{}.csv'.format(frm, to))
     np.savetxt(path, np.array(result), delimiter=',', fmt='%s')
 
 
+def main():
+    for i in range(1, 125000, 5000):
+        scrape_ratings(i, i + 5000 - 1)
+
+
 if __name__ == '__main__':
-    scrape_ratings()    
+    main()
