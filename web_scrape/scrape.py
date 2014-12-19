@@ -2,6 +2,7 @@ import requests
 from lxml import html
 import numpy as np
 import os
+import multiprocessing
 
 
 def extract_info(url, subId):
@@ -19,6 +20,8 @@ def extract_info(url, subId):
         numPage = int(temp1[0])
     # Iterate through all pages to extract data
     result = []
+    if numPage > 1000:
+        return result
     for i in range(1, numPage + 1):
         payload = {'page': str(i)}
         p = requests.get(url, params=payload)
@@ -68,9 +71,18 @@ def scrape_ratings(frm, to):
     np.savetxt(path, np.array(result), delimiter=',', fmt='%s')
 
 
+def scrape_wrapper(ft):
+    print 'starting subjects {} to {}'.format(ft[0], ft[1])
+    scrape_ratings(*ft)
+    print 'finished subjects {} to {}'.format(ft[0], ft[1])
+
+
 def main():
-    for i in range(1, 125000, 5000):
-        scrape_ratings(i, i + 5000 - 1)
+    args = zip(range(1, 125000, 2500), range(2500, 125000, 2500))
+    pool = multiprocessing.Pool(4)
+    pool.map_async(scrape_wrapper, args)
+    pool.close()
+    pool.join()
 
 
 if __name__ == '__main__':
