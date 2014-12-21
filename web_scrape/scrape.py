@@ -30,11 +30,14 @@ def extract_info(url, subId):
              '/div/strong/a/span[2]/../@href'
         s2 = '//li[@class="user odd" or @class="user"]' + \
              '/div/strong/a/span[2]/@class'
+        s3 = '//li[@class="user odd" or @class="user"]' + \
+             '/div/strong/a/span[2]/../../../p/text()'
         l1 = t.xpath(s1)
         l2 = t.xpath(s2)
+        l3 = t.xpath(s3)
         l1 = [e.split('/')[2] for e in l1]
         l2 = [e.split(' ')[0][5:] for e in l2]
-        result = result + zip([str(subId)] * len(l1), l1, l2)
+        result = result + zip(l3, [str(subId)] * len(l1), l1, l2)
     return result
 
 
