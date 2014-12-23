@@ -29,19 +29,19 @@ def train(fpath):
                                                                   item_id='SubId',
                                                                   item_test_proportion=0.25,
                                                                   random_seed=3456)
-    numf = [2 ** e for e in range(3, 8)]
-    regl = [1e-6, 3e-6, 1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
+    stype = ['jaccard', 'cosine', 'pearson']
+    thres = [10 ** e for e in range(-8, 1)]
     res = {}
     min_rmse = 99999.0
-    coor_min_rmse = (numf[0], regl[0])
-    for j in numf:
-        for i in regl:
-            rcmder = gl.recommender.factorization_recommender.create(training,
-                                                                     user_id='UserId',
-                                                                     item_id='SubId',
-                                                                     target='Rating',
-                                                                     regularization=i,
-                                                                     num_factors=j)
+    coor_min_rmse = (stype[0], thres[0])
+    for j in stype:
+        for i in thres:
+            rcmder = gl.recommender.item_similarity_recommender.create(training,
+                                                                       user_id='UserId',
+                                                                       item_id='SubId',
+                                                                       target='Rating',
+                                                                       threshold=i,
+                                                                       similarity_type=j)
             res[(j, i)] = rcmder.evaluate(validate, metric='rmse',
                                           target='Rating')['rmse_overall']
             if res[(j, i)] < min_rmse:
@@ -49,12 +49,12 @@ def train(fpath):
                 coor_min_rmse = (j, i)
     print res
     print 'best combination is {} with RMSE {}'.format(coor_min_rmse, min_rmse)
-    rcmder = gl.recommender.factorization_recommender.create(dataset,
-                                                             user_id='UserId',
-                                                             item_id='SubId',
-                                                             target='Rating',
-                                                             regularization=coor_min_rmse[1],
-                                                             num_factors=coor_min_rmse[0])
+    rcmder = gl.recommender.item_similarity_recommender.create(dataset,
+                                                               user_id='UserId',
+                                                               item_id='SubId',
+                                                               target='Rating',
+                                                               threshold=coor_min_rmse[1],
+                                                               similarity_type=coor_min_rmse[0])
     print 'finished training model'
     print rcmder.evaluate(test, metric='rmse', target='Rating')
     return rcmder
