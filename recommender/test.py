@@ -2,7 +2,7 @@ import graphlab as gl
 
 
 def main():
-    rcmder = gl.load_model('model')
+    rcmder = gl.load_model('model3')
     rcmder.recommend(['glennq', 'neonh'], k=30).print_rows(60, 4)
 
 
