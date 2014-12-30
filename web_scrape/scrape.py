@@ -43,6 +43,8 @@ def extract_info(url, subId):
 
 def scrape_subject_rating(url, subId):
     page = requests.get(url)
+    if page.url.split('/')[-1] != str(subId):
+        return []
     tree = html.fromstring(page.text)
     s = tree.xpath("//ul[@id='navMenuNeue']/li/a/@class")
     if not any(['focus' in e for e in s]):
@@ -69,6 +71,7 @@ def scrape_ratings(frm, to):
             result = result + temp
         print "finished subject " + str(n)
         n += 1
+        del temp
     path = os.path.join(os.pardir, os.pardir,
                         'data', 'ratings_{}_{}.csv'.format(frm, to))
     np.savetxt(path, np.array(result), delimiter=',', fmt='%s')
