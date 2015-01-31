@@ -10,13 +10,23 @@ def train(fpath):
     df.SubId = np.object_(np.int64(df.SubId))
     df.UserId = np.object_(df.UserId)
     df.Rating = np.int64(df.Rating)
-    temp = df.UserId.value_counts()[df.UserId.value_counts() < 10].index
+    # remove users with less than 50 ratings
+    temp = df.UserId.value_counts()[df.UserId.value_counts() < 50].index
     temp = set(temp)
     remain = []
     for i in df.index:
         if df.UserId[i] not in temp:
             remain.append(i)
     df = df.loc[remain]
+    # remove items with less than 50 ratings
+    temp = df.SubId.value_counts()[df.SubId.value_counts() < 50].index
+    temp = set(temp)
+    remain = []
+    for i in df.index:
+        if df.SubId[i] not in temp:
+            remain.append(i)
+    df = df.loc[remain]
+
     sf = gl.SFrame(df)
     print 'finished reading in data'
     dataset, test = gl.recommender.util.random_split_by_user(sf,
@@ -63,7 +73,7 @@ def train(fpath):
 def main():
     fpath = os.path.join(os.pardir, os.pardir, 'data', 'ratings.csv')
     rcmder = train(fpath)
-    rcmder.save('model5')
+    rcmder.save('model7')
     test(rcmder)
 
 

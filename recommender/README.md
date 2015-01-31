@@ -1,0 +1,1 @@
+currently model6 with 64 latent factors and l2 regularization parameter of 3e-5 is the best with overall test RMSE = 1.0317. (max_iterations=100). Training was done after first removing users with less than 50 ratings and then items with less than 50 ratings.
